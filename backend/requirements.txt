@@ -14,3 +14,7 @@ typing_extensions==4.15.0
 uvicorn==0.40.0
 sqlalchemy>=2.0.25
 psycopg2-binary>=2.9.9
+bcrypt
+python-jose[cryptography]
+python-multipart
+email-validator
