@@ -78,18 +78,24 @@ Base.metadata.create_all(bind=engine)
 # --- SCHEMAS ---
 class UserCreate(BaseModel):
     email: EmailStr
-    username: str
+    first_name: str  # Added
+    last_name: str   # Added
     password: str = Field(..., max_length=72)
 
 class UserOut(BaseModel):
     id: int
     email: str
-    username: str
+    first_name: str  # Added
+    last_name: str   # Added
     role: str
     class Config: from_attributes = True
 
 class AssessmentCreate(BaseModel):
     score: float
+
+class PasswordChangeRequest(BaseModel):
+    current_password: str
+    new_password: str
 
 # --- APP ---
 app = FastAPI()
@@ -133,9 +139,10 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     
     new_user = DBUser(
         email=user.email,
-        username=user.username,
+        first_name=user.first_name, # Updated
+        last_name=user.last_name,   # Updated
         hashed_password=get_password_hash(user.password),
-        role="generic"
+        role="user" # Usually better to default to "user"
     )
     db.add(new_user)
     db.commit()
@@ -173,3 +180,19 @@ def get_me(current_user: DBUser = Depends(get_current_user)):
         "last_name": current_user.last_name,
         "role": current_user.role
     }
+
+@app.post("/api/change-password")
+def change_password(
+    request: PasswordChangeRequest, 
+    current_user: DBUser = Depends(get_current_user), 
+    db: Session = Depends(get_db)
+):
+    # 1. Verify the current password is correct using your helper
+    if not verify_password(request.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Current password incorrect")
+    
+    # 2. Hash and update with the new password using your helper
+    current_user.hashed_password = get_password_hash(request.new_password)
+    db.commit()
+    
+    return {"message": "Password updated successfully"}

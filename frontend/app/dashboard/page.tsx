@@ -63,13 +63,14 @@ export default function UserDashboard() {
             </span>!
         </h1>
         <p className="text-gray-500 mt-2">Account: {user?.email}</p>
+        
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Profile Card */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
           <div className="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-3xl font-bold mb-4">
-            {user?.first_name?.[0]}{user?.last_name?.[0]}
+            {user?.last_name?.[0].toUpperCase()}
           </div>
           <h2 className="font-bold text-xl">{user?.first_name} {user?.last_name}</h2>
           <p className="text-sm text-gray-400 capitalize">{user?.role} Account</p>
@@ -77,6 +78,18 @@ export default function UserDashboard() {
           <p className="text-xs text-gray-500 leading-relaxed">
             Your profile is verified. You can now access all competence assessment areas.
           </p>
+          <section className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center">
+            <div>
+                <h3 className="font-bold text-gray-900">Account Security</h3>
+                <p className="text-sm text-gray-500">Manage your password and protection settings.</p>
+            </div>
+            <button 
+                onClick={() => router.push("/dashboard/settings")}
+                className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-semibold hover:bg-gray-50 transition"
+            >
+                Edit Settings
+            </button>
+            </section>
         </div>
 
         {/* Status Section */}
