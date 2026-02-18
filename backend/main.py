@@ -57,10 +57,11 @@ def create_access_token(data: dict):
 class DBUser(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True, nullable=False)
-    username = Column(String, unique=True, index=True)
-    hashed_password = Column(String, nullable=False)
-    role = Column(String, default="generic")
+    email = Column(String, unique=True, index=True)
+    first_name = Column(String)  # New field
+    last_name = Column(String)   # New field
+    hashed_password = Column(String)
+    role = Column(String, default="user")
     assessments = relationship("DBAssessment", back_populates="owner")
 
 class DBAssessment(Base):
@@ -96,7 +97,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[os.getenv("FRONTEND_URL", "http://localhost:3000")],
-    allow_origin_regex="https://.*\.vercel\.app",
+    # allow_origin_regex="https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -158,3 +159,17 @@ def save_assessment(data: AssessmentCreate, db: Session = Depends(get_db), curre
     db.commit()
     db.refresh(new_entry)
     return {"status": "success", "assessment_id": new_entry.id}
+
+@app.get("/api/hello")
+async def read_root():
+    return {"message": "Backend online"}
+
+
+@app.get("/api/me")
+def get_me(current_user: DBUser = Depends(get_current_user)):
+    return {
+        "email": current_user.email,
+        "first_name": current_user.first_name,
+        "last_name": current_user.last_name,
+        "role": current_user.role
+    }
