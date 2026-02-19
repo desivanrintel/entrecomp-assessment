@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface ManagedUser {
-  id: int;
+  id: number;
   first_name: string;
   last_name: string;
   email: string;
