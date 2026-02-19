@@ -3,7 +3,7 @@ import bcrypt  # We use this directly now
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, relationship
 from sqlalchemy.sql import func
@@ -11,6 +11,7 @@ from pydantic import BaseModel, EmailStr, Field
 from dotenv import load_dotenv
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+from typing import List
 
 load_dotenv()
 
@@ -62,6 +63,7 @@ class DBUser(Base):
     last_name = Column(String)   # New field
     hashed_password = Column(String)
     role = Column(String, default="user")
+    is_active = Column(Boolean, default=False)  # <-- Add this line
     assessments = relationship("DBAssessment", back_populates="owner")
 
 class DBAssessment(Base):
@@ -96,6 +98,18 @@ class AssessmentCreate(BaseModel):
 class PasswordChangeRequest(BaseModel):
     current_password: str
     new_password: str
+    confirm_new_password: str # Added field
+
+# Use a specific schema for the user list to avoid sending hashed passwords
+class UserManagementOut(BaseModel):
+    id: int
+    email: str
+    first_name: str
+    last_name: str
+    role: str
+    is_active: bool
+    assessment_count: int  # New field
+    class Config: from_attributes = True
 
 # --- APP ---
 app = FastAPI()
@@ -151,10 +165,17 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @app.post("/api/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    # OAuth2PasswordRequestForm uses 'username' field for the input email
     user = db.query(DBUser).filter(DBUser.email == form_data.username).first()
+    
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
+    
+    # Check if the account is disabled
+    if not user.is_active:
+        raise HTTPException(
+            status_code=403, 
+            detail="Account disabled. Please contact an administrator for activation."
+        )
     
     token = create_access_token(data={"sub": user.email})
     return {"access_token": token, "token_type": "bearer", "role": user.role}
@@ -196,3 +217,36 @@ def change_password(
     db.commit()
     
     return {"message": "Password updated successfully"}
+
+@app.get("/api/admin/users", response_model=List[UserManagementOut])
+def get_all_users(
+    current_user: DBUser = Depends(get_current_user), 
+    db: Session = Depends(get_db)
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    users = db.query(DBUser).all()
+    
+    # Manually attach the count for the response
+    for user in users:
+        user.assessment_count = len(user.assessments) #
+        
+    return users
+
+@app.patch("/api/admin/users/{user_id}/toggle-active")
+def toggle_user_active(
+    user_id: int, 
+    current_user: DBUser = Depends(get_current_user), 
+    db: Session = Depends(get_db)
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    target_user = db.query(DBUser).filter(DBUser.id == user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    target_user.is_active = not target_user.is_active
+    db.commit()
+    return {"is_active": target_user.is_active}

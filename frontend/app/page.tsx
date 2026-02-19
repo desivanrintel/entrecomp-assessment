@@ -25,10 +25,10 @@ export default function Home() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link 
-            href={isLoggedIn ? "/assessment" : "/login"} 
+            href={isLoggedIn ? "/dashboard" : "/register"} 
             className="px-8 py-4 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-200"
           >
-            {isLoggedIn ? "Continue Assessment" : "Start Assessment"}
+            {isLoggedIn ? "Continue Assessment" : "Register"}
           </Link>
           
           {!isLoggedIn && (

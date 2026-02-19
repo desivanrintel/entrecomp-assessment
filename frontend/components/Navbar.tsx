@@ -30,7 +30,9 @@ export default function Navbar() {
   return (
     <nav className="bg-gray-900 text-white px-8 py-4 flex justify-between items-center shadow-lg">
       <div className="flex gap-8 items-center">
-        <span className="font-black text-xl tracking-tighter text-blue-400">ENTRECOMP</span>
+        <span className="font-black text-xl tracking-tighter text-blue-400"><Link href="/" className={`hover:text-blue-300 ${pathname === '/dashboard' ? 'text-blue-400' : ''}`}>
+            Entrecomp
+          </Link></span>
         
         <div className="flex gap-4 text-sm font-medium">
           <Link href="/dashboard" className={`hover:text-blue-300 ${pathname === '/dashboard' ? 'text-blue-400' : ''}`}>
