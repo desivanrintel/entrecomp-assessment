@@ -64,7 +64,8 @@ class DBUser(Base):
     hashed_password = Column(String)
     role = Column(String, default="user")
     is_active = Column(Boolean, default=False)  # <-- Add this line
-    assessments = relationship("DBAssessment", back_populates="owner")
+    assessments = relationship("DBAssessment", back_populates="owner", cascade="all, delete-orphan")
+    detailed_assessments = relationship("DBDetailedAssessment", back_populates="owner", cascade="all, delete-orphan")
 
 class DBAssessment(Base):
     __tablename__ = "assessments"
@@ -73,6 +74,39 @@ class DBAssessment(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     user_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("DBUser", back_populates="assessments")
+
+class DBDetailedAssessment(Base):
+    __tablename__ = "detailed_assessments"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Area 1: Ideas & Opportunities
+    spotting_opportunities = Column(Integer, default=0)
+    creativity = Column(Integer, default=0)
+    vision = Column(Integer, default=0)
+    valuing_ideas = Column(Integer, default=0)
+    ethical_thinking = Column(Integer, default=0)
+
+    # Area 2: Resources
+    self_awareness = Column(Integer, default=0)
+    motivation = Column(Integer, default=0)
+    mobilising_resources = Column(Integer, default=0)
+    financial_literacy = Column(Integer, default=0)
+    mobilising_others = Column(Integer, default=0)
+
+    # Area 3: Into Action
+    taking_initiative = Column(Integer, default=0)
+    planning_management = Column(Integer, default=0)
+    coping_with_ambiguity = Column(Integer, default=0)
+    working_with_others = Column(Integer, default=0)
+    learning_through_experience = Column(Integer, default=0)
+
+    owner = relationship("DBUser", back_populates="detailed_assessments")
+
+# Don't forget to add the relationship to your DBUser class as well:
+# detailed_assessments = relationship("DBDetailedAssessment", back_populates="owner")
 
 # Tables are created AFTER models are defined
 Base.metadata.create_all(bind=engine)
@@ -110,6 +144,23 @@ class UserManagementOut(BaseModel):
     is_active: bool
     assessment_count: int  # New field
     class Config: from_attributes = True
+
+class AssessmentSubmit(BaseModel):
+    spotting_opportunities: int
+    creativity: int
+    vision: int
+    valuing_ideas: int
+    ethical_thinking: int
+    self_awareness: int
+    motivation: int
+    mobilising_resources: int
+    financial_literacy: int
+    mobilising_others: int
+    taking_initiative: int
+    planning_management: int
+    coping_with_ambiguity: int
+    working_with_others: int
+    learning_through_experience: int
 
 # --- APP ---
 app = FastAPI()
@@ -250,3 +301,99 @@ def toggle_user_active(
     target_user.is_active = not target_user.is_active
     db.commit()
     return {"is_active": target_user.is_active}
+
+@app.delete("/api/admin/users/{user_id}")
+def delete_user(
+    user_id: int, 
+    db: Session = Depends(get_db), 
+    current_user: DBUser = Depends(get_current_user)
+):
+    # 1. Security Check: Only admins can delete users
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # 2. Find the user
+    user_to_delete = db.query(DBUser).filter(DBUser.id == user_id).first()
+    if not user_to_delete:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # 3. Prevent self-deletion
+    if user_to_delete.id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own admin account")
+
+    # 4. Clean up related data (Assessments)
+    # This ensures no "orphaned" assessments remain in the database
+    db.query(DBAssessment).filter(DBAssessment.user_id == user_id).delete()
+    
+    # 5. Delete the user and commit
+    db.delete(user_to_delete)
+    db.commit()
+    
+    return {"message": f"User {user_to_delete.email} and all their data have been deleted."}
+
+@app.post("/api/assessments/detailed")
+def submit_detailed_assessment(
+    data: AssessmentSubmit, 
+    db: Session = Depends(get_db), 
+    current_user: DBUser = Depends(get_current_user)
+):
+    # Create the new record
+    new_result = DBDetailedAssessment(
+        user_id=current_user.id,
+        # This double asterisk (**) unpacks the dictionary 
+        # so 'creativity' in the JSON goes to the 'creativity' column
+        **data.dict() 
+    )
+    
+    try:
+        db.add(new_result)
+        db.commit()
+        db.refresh(new_result)
+        return {"message": "EntreComp assessment saved", "id": new_result.id}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/api/assessments/latest")
+def get_latest_assessment(
+    db: Session = Depends(get_db), 
+    current_user: DBUser = Depends(get_current_user)
+):
+    # Fetch the most recent detailed assessment for this user
+    result = db.query(DBDetailedAssessment)\
+        .filter(DBDetailedAssessment.user_id == current_user.id)\
+        .order_by(DBDetailedAssessment.created_at.desc())\
+        .first()
+        
+    if not result:
+        return {"message": "No assessments found"}
+        
+    return result
+
+@app.get("/api/admin/users/{user_id}/latest")
+def get_user_latest_assessment_admin(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: DBUser = Depends(get_current_user)
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    target_user = db.query(DBUser).filter(DBUser.id == user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    result = db.query(DBDetailedAssessment)\
+        .filter(DBDetailedAssessment.user_id == user_id)\
+        .order_by(DBDetailedAssessment.created_at.desc())\
+        .first()
+        
+    if not result:
+        # Return a specific structure so the frontend knows there's no data
+        return {"message": "No assessments found", "no_data": True}
+    
+    # Convert SQLAlchemy object to a standard Dictionary
+    response_data = {c.name: getattr(result, c.name) for c in result.__table__.columns}
+    response_data["user_name"] = f"{target_user.first_name} {target_user.last_name}"
+    
+    return response_data

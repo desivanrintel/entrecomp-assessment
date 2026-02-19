@@ -64,6 +64,28 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteUser = async (userId: number) => {
+  if (!confirm("Are you sure? This will permanently delete the user and all their assessment data.")) return;
+
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(`${API_URL}/api/admin/users/${userId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    
+    if (response.ok) {
+      // Remove from local list immediately
+      setUsers(users.filter(u => u.id !== userId));
+    } else {
+      const data = await response.json();
+      alert(data.detail || "Deletion failed");
+    }
+  } catch (err) {
+    alert("Error connecting to server");
+  }
+};
+
   if (!isAdmin) return <div className="p-8">Loading...</div>;
 
   return (
@@ -123,17 +145,34 @@ export default function AdminDashboard() {
           </span>
         </td>
         <td className="px-6 py-4 text-right">
-          <button 
-            onClick={() => toggleUserStatus(u.id)}
-            className={`text-xs font-bold py-2 px-4 rounded-xl transition-all ${
-              u.is_active 
-                ? 'text-red-600 bg-red-50 hover:bg-red-100' 
-                : 'text-green-600 bg-green-50 hover:bg-green-100'
-            }`}
-          >
-            {u.is_active ? "Deactivate" : "Activate User"}
-          </button>
-        </td>
+            <div className="flex justify-end gap-2">
+              <button 
+  onClick={() => router.push(`/results?user_id=${u.id}`)}
+  className="text-xs font-bold py-2 px-4 rounded-xl text-blue-600 bg-blue-50 hover:bg-blue-100 transition-all"
+>
+  View DNA
+</button>
+              {/* Activation Toggle */}
+              <button 
+                onClick={() => toggleUserStatus(u.id)}
+                className={`text-xs font-bold py-2 px-4 rounded-xl transition-all ${
+                  u.is_active 
+                    ? 'text-amber-600 bg-amber-50 hover:bg-amber-100' 
+                    : 'text-green-600 bg-green-50 hover:bg-green-100'
+                }`}
+              >
+                {u.is_active ? "Deactivate" : "Activate"}
+              </button>
+
+              {/* Delete Button */}
+              <button 
+                onClick={() => handleDeleteUser(u.id)}
+                className="text-xs font-bold py-2 px-4 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 transition-all"
+              >
+                Delete
+              </button>
+            </div>
+          </td>
       </tr>
     ))}
   </tbody>
