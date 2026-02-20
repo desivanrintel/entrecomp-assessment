@@ -3,7 +3,7 @@ import bcrypt  # We use this directly now
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, DateTime, Boolean
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, DateTime, Boolean, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, relationship
 from sqlalchemy.sql import func
@@ -137,13 +137,15 @@ class PasswordChangeRequest(BaseModel):
 # Use a specific schema for the user list to avoid sending hashed passwords
 class UserManagementOut(BaseModel):
     id: int
-    email: str
     first_name: str
     last_name: str
+    email: str
     role: str
     is_active: bool
-    assessment_count: int  # New field
-    class Config: from_attributes = True
+    assessment_count: int  # <--- Add this line!
+
+    class Config:
+        from_attributes = True
 
 class AssessmentSubmit(BaseModel):
     spotting_opportunities: int
@@ -277,13 +279,20 @@ def get_all_users(
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    users = db.query(DBUser).all()
+    # Efficiently query users and count their assessments in one go
+    results = db.query(
+        DBUser, 
+        func.count(DBDetailedAssessment.id).label("assessment_count")
+    ).outerjoin(DBDetailedAssessment).group_by(DBUser.id).all()
     
-    # Manually attach the count for the response
-    for user in users:
-        user.assessment_count = len(user.assessments) #
+    users_output = []
+    for user, count in results:
+        # Create a dictionary from the user object
+        user_dict = {column.name: getattr(user, column.name) for column in user.__table__.columns}
+        user_dict["assessment_count"] = count
+        users_output.append(user_dict)
         
-    return users
+    return users_output
 
 @app.patch("/api/admin/users/{user_id}/toggle-active")
 def toggle_user_active(
@@ -397,3 +406,37 @@ def get_user_latest_assessment_admin(
     response_data["user_name"] = f"{target_user.first_name} {target_user.last_name}"
     
     return response_data
+
+@app.get("/api/admin/users/{user_id}/assessments")
+def get_user_assessment_history(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: DBUser = Depends(get_current_user)
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    target_user = db.query(DBUser).filter(DBUser.id == user_id).first()
+    records = db.query(DBDetailedAssessment)\
+        .filter(DBDetailedAssessment.user_id == user_id)\
+        .order_by(DBDetailedAssessment.created_at.desc())\
+        .all()
+
+    history = []
+    for r in records:
+        # Dynamically calculate avg score for the summary list
+        scores = [
+            r.spotting_opportunities, r.creativity, r.vision, r.valuing_ideas, r.ethical_thinking,
+            r.self_awareness, r.motivation, r.mobilising_resources, r.financial_literacy, r.mobilising_others,
+            r.taking_initiative, r.planning_management, r.coping_with_ambiguity, r.working_with_others, r.learning_through_experience
+        ]
+        history.append({
+            "id": r.id,
+            "created_at": r.created_at,
+            "avg_score": sum(scores) / 15
+        })
+
+    return {
+        "user_name": f"{target_user.first_name} {target_user.last_name}",
+        "assessments": history
+    }

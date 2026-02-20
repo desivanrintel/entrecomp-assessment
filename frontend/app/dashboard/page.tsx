@@ -10,7 +10,6 @@ interface UserProfile {
   role: string;
 }
 
-// Add an interface for the assessment data
 interface AssessmentData {
   id: number;
   created_at: string;
@@ -48,31 +47,44 @@ export default function UserDashboard() {
       }
 
       try {
-        // Fetch User Profile
+        // 1. Fetch User Profile
         const userRes = await fetch(`${API_URL}/api/me`, {
-          headers: { Authorization: `Bearer ${token}` },
+          method: "GET",
+          headers: { 
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
         });
 
-        if (!userRes.ok) throw new Error("Session expired");
+        if (userRes.status === 401) throw new Error("Unauthorized");
+        if (!userRes.ok) throw new Error("Failed to fetch profile");
+        
         const userData = await userRes.json();
         setUser(userData);
 
-        // Fetch Latest Assessment
+        // 2. Fetch Latest Assessment (INTEGRATED HERE)
         const assessmentRes = await fetch(`${API_URL}/api/assessments/latest`, {
-          headers: { Authorization: `Bearer ${token}` },
+          method: "GET",
+          headers: { 
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
         });
 
         if (assessmentRes.ok) {
           const assessmentData = await assessmentRes.json();
-          // Check if it's actual data or just a message saying "none found"
-          if (assessmentData && !assessmentData.message) {
+          // Check if data exists and isn't just an empty message from the API
+          if (assessmentData && assessmentData.id) {
             setLatestAssessment(assessmentData);
           }
         }
+        
       } catch (err) {
         console.error("Dashboard fetch error:", err);
-        localStorage.clear();
-        router.push("/login");
+        if (err instanceof Error && err.message === "Unauthorized") {
+          localStorage.removeItem("token");
+          router.push("/login");
+        }
       } finally {
         setLoading(false);
       }
@@ -85,8 +97,6 @@ export default function UserDashboard() {
 
   return (
     <main className="max-w-6xl mx-auto p-8">
-      {/* ... (Header and Profile Card remain same) ... */}
-      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Profile Card Sidebar */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center h-fit">
@@ -107,7 +117,6 @@ export default function UserDashboard() {
         {/* Main Content Area */}
         <div className="lg:col-span-2 space-y-6">
           {latestAssessment ? (
-            /* SHOW THIS IF ASSESSMENT EXISTS */
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
               <div className="flex justify-between items-start mb-6">
                 <div>
@@ -122,7 +131,6 @@ export default function UserDashboard() {
                 </button>
               </div>
 
-              {/* Quick Summary Preview */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-blue-50 p-4 rounded-xl">
                   <p className="text-[10px] uppercase font-bold text-blue-400 mb-1">Ideas</p>
@@ -152,7 +160,6 @@ export default function UserDashboard() {
               </button>
             </div>
           ) : (
-            /* SHOW THIS IF NO ASSESSMENT EXISTS */
             <div className="bg-gray-900 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
               <div className="relative z-10">
                 <h3 className="text-xl font-bold mb-2">Ready to grow?</h3>

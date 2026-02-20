@@ -22,6 +22,36 @@ export default function AssessmentWizard() {
 
   const currentData = ENTRECOMP_STEPS[step];
 
+  // Integration: The actual Save function
+  const submitAssessment = async () => {
+    setLoading(true);
+    const token = localStorage.getItem("token");
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+    try {
+      const response = await fetch(`${API_URL}/api/assessments/detailed`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(scores),
+      });
+
+      if (response.ok) {
+        router.push("/results"); 
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.detail || "Failed to save"}`);
+      }
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[#f8fafc] py-12 px-4">
       <div className="max-w-2xl mx-auto">
@@ -60,7 +90,6 @@ export default function AssessmentWizard() {
                   {field.description}
                 </p>
 
-                {/* Styled Range Slider */}
                 <div className="relative pt-2">
                   <input
                     type="range"
@@ -91,8 +120,11 @@ export default function AssessmentWizard() {
         {/* Navigation Buttons */}
         <div className="mt-12 flex items-center justify-between">
           <button
-            disabled={step === 0}
-            onClick={() => setStep(step - 1)}
+            disabled={step === 0 || loading}
+            onClick={() => {
+                setStep(step - 1);
+                window.scrollTo(0, 0);
+            }}
             className="px-6 py-3 text-slate-400 font-bold hover:text-slate-600 disabled:opacity-0 transition"
           >
             ← Previous
@@ -100,12 +132,17 @@ export default function AssessmentWizard() {
           
           <button
             onClick={() => {
-              if (step < 2) setStep(step + 1);
-              else console.log("Submit logic here", scores); // Call your submit function
+              if (step < 2) {
+                setStep(step + 1);
+                window.scrollTo(0, 0);
+              } else {
+                submitAssessment(); // Now calling the integrated function
+              }
             }}
-            className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-blue-600 shadow-xl shadow-slate-200 transition-all active:scale-95"
+            disabled={loading}
+            className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-blue-600 shadow-xl shadow-slate-200 transition-all active:scale-95 disabled:bg-slate-400"
           >
-            {step === 2 ? "Generate DNA Profile" : "Continue"}
+            {loading ? "Generating Profile..." : step === 2 ? "Finish & View DNA" : "Continue"}
           </button>
         </div>
       </div>
