@@ -119,42 +119,42 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
         id: "cr_problems",
         title: "Define Problems",
         levels: {
-          1: "",
-          2: "",
-          3: "",
-          4: "",
-          5: "",
-          6: "",
-          7: "",
-          8: ""
+          1: "I can approach open-ended problems (problems that can have many solutions) with curiosity.",
+          2: "I can explore open-ended problems in many ways so as to generate multiple solutions.",
+          3: "I can take part in group dynamics aimed at defining open-ended problems.",
+          4: "I can reshape open-ended problems to fit my skills.",
+          5: "I can describe and explain different approaches to shaping open-ended problems and different problem solving strategies.",
+          6: "I can help others create value by encouraging experimentation and using creative techniques to approach problems and generate solutions.",
+          7: "I can initiate, develop, manage and complete a creative project.",
+          8: "I can use a mix of creative techniques to keep generating value over time."
         }
       },
       {
         id: "cr_value",
         title: "Design Value",
         levels: {
-          1: "",
-          2: "",
-          3: "",
-          4: "",
-          5: "",
-          6: "",
-          7: "",
-          8: ""
+          1: "I can assemble objects that create value for me and others.",
+          2: "I can improve existing products, services and processes so that they better meet my needs or those of my peers and the community.",
+          3: "I can identify the basic functions that a prototype should have to illustrate the value of my idea.",
+          4: "I can assemble, test and progressively refine prototypes that simulate the value I want to create.",
+          5: "I can create (alone or with others) products or services that solve my problems and my needs.",
+          6: "I can develop and deliver value in stages, launching with the core features of my (or my team’s) idea and progressively adding more.",
+          7: "I can apply different design approaches to create value through new products, processes or services.",
+          8: "I can design and put in place innovative processes to create value."
         }
       },
       {
         id: "cr_innovative",
         title: "Be Innovative",
         levels: {
-          1: "",
-          2: "",
-          3: "",
-          4: "",
-          5: "",
-          6: "",
-          7: "",
-          8: ""
+          1: "I can find examples of innovative products, services and solutions.",
+          2: "I can describe how some innovations have transformed society.",
+          3: "I can tell the difference between types of innovations (for example, process versus product innovation and social innovation, incremental versus disruptive innovation).",
+          4: "I can judge if an idea, product or process is innovative or just new to me.",
+          5: "I can describe how innovations diffuse in society, culture and the market.",
+          6: "I can describe different levels of innovation (for example, incremental, breakthrough or transformational) and their role in value-creating activities.",
+          7: "I can identify the steps needed to research the potential for an innovative idea in light of its development into an existing enterprise, a new venture or an opportunity for social change.",
+          8: "I can manage innovation processes that respond to emerging needs and make the most of opportunities as they become available."
         }
       }
     ]
