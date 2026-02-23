@@ -624,17 +624,46 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
   {
     name: "Taking the initiative",
     area: "Into Action",
-    hint: "",
+    hint: "Go for it",
     description: "Initiate processes that create value. Take up challenges. Act and work independently to achieve goals, stick to intentions and carry out planned tasks. ",
     threads: [
       {
-        id: "",
-        title: "",
+        id: "ti_responsibility",
+        title: "Take responsibility",
         levels: {
-          1: "",
-          4: "",
-          6: "",
-          8: ""
+          1: "I can carry out the tasks I am given responsibly.",
+          2: "I am comfortable in taking responsibility in shared activities.",
+          3: "I can take individual and group responsibility to carry out simple tasks in value creating activities.",
+          4: "I can take individual and group responsibility in value creating activities.",
+          5: "I can delegate responsibility appropriately.",
+          6: "I can encourage others to take responsibility in value creating activities.",
+          7: "I take responsibility in complex value creating activities.", 
+          8: "I can take responsibility in seizing new opportunities and when facing unprecedented challenges in value creating activities."
+        }
+      },
+      {
+        id: "ti_independently",
+        title: "Work independently",
+        levels: {
+          1: "I show some independence in carrying out tasks I am given.",
+          2: "I can work independently in simple value creating activities.",
+          3: "I can initiate simple value creating activities.",
+          4: "I am driven by the possibility of being able to initiate value creating activities independently.",
+          5: "I can initiate value creating activities alone and with others.",
+          6: "I can help others work independently.",
+          8: "I praise initiative taken by others and reward it appropriately within my team and organisation.",
+        }
+      },
+      {
+        id: "ti_action",
+        title: "Take action",
+        levels: {
+          1: "I can have a go at solving problems that affect my surroundings.",
+          2: "I show initiative in dealing with problems that affect my community.",
+          4: "I actively face challenges, solve problems and seize opportunities to create value.",
+          5: "I take action on new ideas and opportunities, which will add value to a new or existing value creating venture.",
+          6: "I value others taking the initiative in solving problems and creating value.",
+          8: "I can encourage others to take the initiative in solving problems and creating value within my team and organisation."
         }
       }
     ]
@@ -646,13 +675,84 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     description: "Set long-, medium- and short-term goals. Define priorities and action plans. Adapt to unforeseen changes.",
     threads: [
       {
-        id: "",
-        title: "",
+        id: "pm_goals",
+        title: "Define goals",
         levels: {
-          1: "",
-          4: "",
-          6: "",
-          8: ""
+          1: "I can clarify what my goals are in a simple value creating activity.",
+          2: "I can identify alternative goals to create value in a simple context.",
+          3: "I can describe my goals for the future in line with my strengths, ambitions, interests and achievements.",
+          4: "I can set short term goals that I can act on. ",
+          5: "I can define long term goals arising from the vision for my (or my team’s) value-creating activity.",
+          6: "I can match short term, mid-term and long-term goals to the vision for my (or my team’s) value creating activity.",
+          7: "I can design a strategy to achieve goals in line with my (or my team’s) vision.",
+          8: "I can manage the balance between the need for creativity and for control so that my organisation’s capacity to achieve its goals is protected and nurtured."
+        }
+      },
+      {
+        id: "pm_plan",
+        title: "Plan and organise",
+        levels: {
+          1: "I can carry out a simple plan for value creating activities.",
+          2: "I can deal with a range of simple tasks at the same time without feeling uncomfortable.",
+          3: "I can create an action plan which identifies the necessary steps to achieve my goals.",
+          4: "I can allow for the possibility of changes to my plans.",
+          5: "I can summarise the basics of project management.",
+          6: "I can apply the basics of project management in managing a value creating activity.",
+          7: "I can develop and stick to a detailed project management plan, adjusting to changing circumstances to make sure goals are reached.",
+          8: "I can design managerial procedures to effectively deliver value in challenging circumstances."
+        }
+      },
+      {
+        id: "pm_develop",
+        title: "Develop sustainable business plans",
+        levels: {
+          3: "I can develop a business model for my idea.",
+          4: "I can define the key elements that make up the business model necessary to deliver the value I have identified.",
+          5: "I can develop a business plan based on the model, describing how to achieve the value identified.",
+          6: "I can organise my value creating activities using planning methods such as business and marketing plans.",
+          7: "I can keep my planning methods updated and adapt them to changing circumstances.",
+          8: "I can adapt my value creating activity’s business model to face new challenges."
+        }
+      },
+      {
+        id: "pm_ priorities",
+        title: "Define priorities",
+        levels: {
+          1: "I can recall the order of steps that was needed in a simple value creating activity I took part in.",
+          2: "I can identify the basic steps that are needed in a value-creating activity.",
+          3: "I can prioritise the basic steps in a value-creating activity.",
+          4: "I can set my own priorities and act on them.",
+          5: "I can define the priorities to meet my (or my team’s) vision.",
+          6: "I can stay focused on the priorities set, despite changing circumstances.",
+          8: "I can define priorities in uncertain circumstances, with partial or ambiguous information."
+        }
+      },
+      {
+        id: "pm_monitor",
+        title: "Monitor your business",
+        levels: {
+          1: "I can recognise how much progress I have made on a task.",
+          2: "I can monitor whether a task is going to plan.",
+          3: "I can identify different types of data that are necessary for monitoring the progress of a simple value creating activity.",
+          4: "I can set basic milestones and observation indicators to monitor the progress of my value creating activity.",
+          5: "I can describe different methods for performance and impact monitoring.",
+          6: "I can define what data is needed to monitor how effective my value creating activities are and an appropriate way to collect it.",
+          7: "I can develop the performance indicators I (or my team) need to monitor progress towards a successful outcome in changing circumstances.",
+          8: "I can design and put in place a data collection plan to monitor whether my venture is achieving its aims."
+        }
+      },
+      {
+        id: "pm_flexible",
+        title: "Be flexible and adapt to changes",
+        levels: {
+          1: "I am open to changes.",
+          2: "I can confront and deal with changes in a constructive way.",
+          3: "I can change my plans based on the needs of my team.",
+          4: "I can adapt my plans to achieve my goals in light of changes that are outside my control.",
+          5: "I can embrace change that brings new opportunities for value creation.",
+          6: "I can anticipate and include change during the value creating process.",
+          7: "I can use the results of monitoring to adjust vision, aims, priorities, resource planning, action steps or any other aspect of the value-creating process.",
+          8: "I can communicate effectively to the organisation the reason for changes and adjustments."
         }
       }
     ]
@@ -660,17 +760,47 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
   {
     name: "Coping with uncertainty, ambiguity & risk",
     area: "Into Action",
-    hint: "",
+    hint: "Make decisions dealing with uncertainty, ambiguity and risk.",
     description: "Make decisions when the result of that decision is uncertain, when the information available is partial or ambiguous, or when there is a risk of unintended outcomes. Within the valuecreating process, include structured ways of testing ideas and prototypes from the early stages, to reduce risks of failing. Handle fast-moving situations promptly and flexibly.",
     threads: [
       {
-        id: "",
-        title: "",
+        id: "co_co",
+        title: "Cope with uncertainty and ambiguity",
         levels: {
-          1: "",
-          4: "",
-          6: "",
-          8: ""
+          1: "I am not afraid of making mistakes while trying new things.",
+          2: "I explore my own ways to achieve things.",
+          3: "I can discuss the role that information plays in reducing uncertainty, ambiguity and risk.",
+          4: "I can actively look for, compare and contrast different sources of information that help me reduce ambiguity, uncertainty, and risks in making decisions.",
+          5: "I can find ways of making decisions when the information is incomplete.",
+          6: "I can pull together different viewpoints to take informed decisions when the degree of uncertainty is high.",
+          7: "I can make decisions evaluating the different elements in a situation that is uncertain and ambiguous.",
+          8: "I can set up appropriate strategies for collecting and monitoring data, which help me take decisions based on sound evidence."
+        }
+      },
+      {
+        id: "co_calculate",
+        title: "Calculate risk",
+        levels: {
+          1: "I can identify examples of risks in my surroundings.",
+          2: "I can describe risks related to a simple value creating activity in which I take part.",
+          3: "I can tell the difference between acceptable and unacceptable risks.",
+          4: "I can weigh up the risks and benefits of self employment with alternative career options and make choices that reflect my preferences.",
+          5: "I can apply the concept of affordable losses to make decisions when creating value.",
+          6: "I can compare value creating activities based on a risk assessment.",
+          7: "I can assess the risks my venture is exposed to as conditions change.",
+          8: "I can evaluate high-risk longterm investments using a structured approach."
+        }
+      },
+      {
+        id: "co_manage",
+        title: "Manage risk",
+        levels: {
+          3: "I can critically evaluate the risks associated with an idea that creates value, taking into account a variety of factors.",
+          4: "I can critically evaluate the risks related to the formal set-up of a value-creating venture in the area in which I work.",
+          5: "I can demonstrate that I can make decisions by weighing up both the risks and the expected benefits of a value creating activity.",
+          6: "I can outline a risk management plan for guiding my (or my team's) choices while developing my value-creating activity.",
+          7: "I can use strategies to reduce the risks that may arise during the value creating process.",
+          8: "I can come up with strategies to reduce the risk of my value-creating initiative becoming obsolete."
         }
       }
     ]
@@ -678,17 +808,87 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
   {
     name: "Working with others",
     area: "Into Action",
-    hint: "",
+    hint: "Team up, work together, and network.",
     description: "Work together and co-operate with others to develop ideas and turn them into action. Network. Solve conflicts and face up to competition positively when necessary.",
     threads: [
       {
-        id: "",
-        title: "",
+        id: "wo_accept",
+        title: "Accept diversity (people's differences)",
         levels: {
-          1: "",
-          4: "",
-          6: "",
-          8: ""
+          1: "I can show respect for others, their background and situations.",
+          2: "I am open to the worth that others can bring to value creating activities.",
+          3: "I can combine different contributions to create value.",
+          5: "I can value diversity as a possible source of ideas and opportunities.",
+          6: "I can support diversity within my team or organisation.",
+          8: "Outside of my organisation, I can find ideas that create value and make the most of them."
+        }
+      },
+      {
+        id: "wo_develop",
+        title: "Develop emotional intelligence",
+        levels: {
+          1: "I can show empathy towards others.",
+          2: "I can recognise the role of my emotions, attitudes and behaviours in shaping other people’s attitudes and behaviours and vice versa. ",
+          3: "I can express my (or my team's) value creating ideas assertively.",
+          4: "I can face and solve conflicts.",
+          5: "I can compromise where necessary.",
+          6: "I can deal with non-assertive behaviour that hinders my (or my team's) value creating activities (for example, destructive attitudes, aggressive behaviour and so on).",
+          8: "I can manage conflicts effectively."
+        }
+      },
+{
+        id: "wo_listen",
+        title: "Listen actively",
+        levels: {
+          1: "I can show empathy towards others.",
+          2: "I can discuss the benefits of listening to other people’s ideas for achieving my (or my team's) goals.",
+          3: "I can listen to other people’s ideas for creating value without showing prejudice.",
+          4: "I can listen to my end users.",
+          5: "I can describe different techniques for managing relationships with end users.",
+          6: "I can put in place strategies to actively listen to my end users and act on their needs.",
+          8: "I can pull together information from a wide range of sources to understand my end users' needs."
+        }
+      },
+      {
+        id: "wo_team",
+        title: "Team up",
+        levels: {
+          1: "I am open to working alone as well as with others, playing different roles and taking some responsibility.",
+          2: "I am willing to change my way of working in a group.",
+          3: "I can work with a range of individuals and teams.",
+          4: "I share the ownership of value creating activities with the members of my team.",
+          5: "I can build a team based on the individual knowledge, skills and attitudes of each member.",
+          6: "I can contribute to creating value by teaming up with distributed communities through digital technologies.",
+          7: "I can design physical and virtual spaces that encourage team members to work together.",
+          8: "I can build an organisation’s capacity to create value by encouraging people to work together."
+        }
+      },
+      {
+        id: "wo_together",
+        title: "Work together",
+        levels: {
+          1: "I am open to involving others in my value creating activities.",
+          2: "I can contribute to simple value creating activities.",
+          3: "I can contribute to group decision making constructively.",
+          4: "I can create a team of people who can work together on a value creating activity.",
+          5: "I can use techniques and tools that help people to work together.",
+          6: "I can give people the help and support they need to perform at their best within a team.",
+          7: "I can work with a remote team of people who can independently contribute to a value creating activity.",
+          8: "I can design working methods and incentives that enable team members to work well together."
+        }
+      },
+      {
+        id: "wo_expand",
+        title: "Expand your network",
+        levels: {
+          1: "I can explain the meaning and forms of association, cooperation and peer-to-peer support (for example, family and other communities).",
+          2: "I am open to establishing new contacts and cooperation with others (individuals and groups).",
+          3: "I can use the relationships I have to get the support I need to turn ideas into action, including emotional support.",
+          4: "I can establish new relationships to get the support I need to turn ideas into action, including emotional support (for example, joining a mentor network).",
+          5: "I can use my network to find the right people to work on my (or my team's) value creating activity.",
+          6: "I proactively make contact with the right people inside and outside my organisation to support my (or my team's) value creating activity (for example, at conferences or on social media).",
+          7: "I can use my network to bring together different perspectives to inform my (or my team's) value creating process.",
+          8: "I can design effective processes to build networks of different or new stakeholders and keep them engaged."
         }
       }
     ]
@@ -696,17 +896,48 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
   {
     name: "Learning through experience",
     area: "Into Action",
-    hint: "",
+    hint: "Learning by doing",
     description: "Use any initiative for value creation as a learning opportunity. Learn with others, including peers and mentors. Reflect and learn from both success and failure (your own and other people’s).",
     threads: [
       {
-        id: "",
-        title: "",
+        id: "le_reflect",
+        title: "Reflect",
         levels: {
-          1: "",
-          4: "",
-          6: "",
-          8: ""
+          1: "I can find examples of great failures that have created value.",
+          2: "I can provide examples of temporary failures that have led to valuable achievements.",
+          3: "I can reflect on failures (mine and other people’s), identify their causes and learn from them.",
+          4: "I can judge if and how I have achieved my goals, so that I can evaluate my performance and learn from it.",
+          5: "I can reflect on my (or my team's) achievements and temporary failures as things develop so as to learn and improve my ability to create value.",
+          6: "I can help others reflect on their achievements and temporary failures by providing honest and constructive feedback.",
+          8: "I can take my team or the organisation to a higher level of performance, based on the feedback collected and by learning lessons from achievements and failures."
+        }
+      },
+      {
+        id: "le_learn",
+        title: "Learn to learn",
+        levels: {
+          1: "I can provide examples that show that my abilities and competence have increased with experience.",
+          2: "I can anticipate that my abilities and competence will grow with experience, through both successes and failures.",
+          3: "I can reflect on the relevance of my learning pathways for my future opportunities and choices.",
+          4: "I am always looking for opportunities to improve my strengths and reduce or compensate for my weaknesses.",
+          5: "I can find and choose opportunities to overcome my (or my team’s) weaknesses and to develop my (or my team’s) strengths.",
+          6: "I can help others develop their strengths and reduce or compensate for their weaknesses.",
+          7: "I can identify opportunities for self-improvement in my organisation and beyond.",
+          8: "I can design and put in place a strategy for my venture to continue to generate value."
+        }
+      },
+      {
+        id: "le_experience",
+        title: "Learn from experience",
+        levels: {
+          1: "I can recognise what I have learnt from taking part in value creating activities.",
+          2: "I can reflect on my experience in taking part in value creating activities and learn from it. ",
+          3: "I can reflect on my interaction with others (including peers and mentors) and learn from it.",
+          4: "I can filter the feedback provided by others and keep the good from it.",
+          5: "I can integrate lifelong learning into my personal development strategy and career progress.",
+          6: "I can help others reflect on their interaction with other people and help them learn from this interaction.",
+          7: "I can learn from the impact monitoring and evaluation activities that I have designed to track the progress of my value creating activity.",
+          8: "I can learn lessons from monitoring and evaluation processes and establish them into my organisation’s learning processes."
         }
       }
     ]

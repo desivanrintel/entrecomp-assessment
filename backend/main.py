@@ -3,7 +3,7 @@ import bcrypt  # We use this directly now
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, DateTime, Boolean, func
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, DateTime, Boolean, func, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, relationship
 from sqlalchemy.sql import func
@@ -66,6 +66,7 @@ class DBUser(Base):
     is_active = Column(Boolean, default=False)  # <-- Add this line
     assessments = relationship("DBAssessment", back_populates="owner", cascade="all, delete-orphan")
     detailed_assessments = relationship("DBDetailedAssessment", back_populates="owner", cascade="all, delete-orphan")
+    expert_assessments = relationship("DBExpertAssessment", back_populates="owner", cascade="all, delete-orphan")
 
 class DBAssessment(Base):
     __tablename__ = "assessments"
@@ -104,6 +105,23 @@ class DBDetailedAssessment(Base):
     learning_through_experience = Column(Integer, default=0)
 
     owner = relationship("DBUser", back_populates="detailed_assessments")
+
+# In main.py, add a new table for Expert Assessments
+class DBExpertAssessment(Base):
+    __tablename__ = "expert_assessments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Store the 60 scores as a JSON object: {"so_seize": 5, "so_value": 4, ...}
+    thread_scores = Column(JSON) 
+    
+    # Pre-calculated competence averages for faster charting
+    ideas_avg = Column(Float)
+    resources_avg = Column(Float)
+    action_avg = Column(Float)
+
 
 # Don't forget to add the relationship to your DBUser class as well:
 # detailed_assessments = relationship("DBDetailedAssessment", back_populates="owner")
@@ -163,6 +181,34 @@ class AssessmentSubmit(BaseModel):
     coping_with_ambiguity: int
     working_with_others: int
     learning_through_experience: int
+
+
+# --- EXPERT ASSESSMENT MAPPING ---
+# This maps the Thread IDs from expert-framework.ts to the 15 Competence keys
+EXPERT_MAPPING = {
+    "Ideas & Opportunities": {
+        "spotting_opportunities": ["so_seize", "so_challenges", "so_needs", "so_analyse"],
+        "creativity": ["cr_curious", "cr_develop", "cr_problems", "cr_value", "cr_innovative"],
+        "vision": ["vi_imagine", "vi_think", "vi_action"],
+        "valuing_ideas": ["vi_value", "vi_protect"],
+        "ethical_thinking": ["et_ethically", "et_sustainably", "et_impact", "et_accountable"]
+    },
+    "Resources": {
+        "self_awareness": ["sa_aspirations", "sa_sw", "sa_ability", "sa_future"],
+        "motivation": ["mp_driven", "mp_determined", "mp_focus", "mp_resilient", "mp_giveup"],
+        "mobilising_resources": ["mr_manage", "mr_responsibly", "mr_make", "mr_support"],
+        "financial_literacy": ["fel_understand", "fel_budget", "fel_funding", "fel_taxation"],
+        "mobilising_others": ["mo_inspire", "mo_persuade", "mo_communicate", "mo_media"]
+    },
+    "Into Action": {
+        "taking_initiative": ["ti_responsibility", "ti_independently", "ti_action"],
+        "planning_management": ["pm_goals", "pm_plan", "pm_develop", "pm_priorities", "pm_monitor", "pm_flexible"],
+        "coping_with_ambiguity": ["co_co", "co_calculate", "co_manage"],
+        "working_with_others": ["wo_accept", "wo_develop", "wo_listen", "wo_team", "wo_together", "wo_expand"],
+        "learning_through_experience": ["le_reflect", "le_learn", "le_experience"]
+    }
+}
+
 
 # --- APP ---
 app = FastAPI()
@@ -440,3 +486,35 @@ def get_user_assessment_history(
         "user_name": f"{target_user.first_name} {target_user.last_name}",
         "assessments": history
     }
+
+@app.post("/api/assessments/expert")
+def submit_expert_assessment(
+    scores: dict, # Dictionary from frontend, e.g., {"so_seize": 4, "so_value": 5, ...}
+    db: Session = Depends(get_db),
+    current_user: DBUser = Depends(get_current_user)
+):
+    # This will store the averaged scores for the 15 competences
+    calculated_results = {}
+    
+    for area, competences in EXPERT_MAPPING.items():
+        for comp_key, thread_ids in competences.items():
+            # Filter the user's submitted scores for the specific threads in this competence
+            relevant_scores = [scores.get(tid) for tid in thread_ids if scores.get(tid) is not None]
+            
+            if relevant_scores:
+                avg_score = sum(relevant_scores) / len(relevant_scores)
+                calculated_results[comp_key] = round(avg_score, 2)
+            else:
+                calculated_results[comp_key] = 0
+
+    # Create the DB record
+    new_assessment = DBExpertAssessment(
+        user_id=current_user.id,
+        thread_scores=scores, # Store the full 60 results for AI analysis later
+        **calculated_results   # Spread the 15 averages into the competence columns
+    )
+    
+    db.add(new_assessment)
+    db.commit()
+    
+    return {"message": "Expert assessment calculated and saved", "results": calculated_results}
