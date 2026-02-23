@@ -108,6 +108,18 @@ export default function ExpertAssessmentPage() {
 
           {/* Right Column: Thread Selection */}
           <div className="lg:col-span-8">
+            <div className="mb-8">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">
+              Building Block
+            </span>
+            {/* THREAD TITLE INTEGRATED HERE */}
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">
+              {currentStep.title}
+            </h2>
+            <p className="text-slate-500 mt-4">
+              Select the statement that best describes your proficiency in this specific area:
+            </p>
+          </div>
             <div className="space-y-3">
               {availableLevels.map((lvl) => {
                 const isSelected = scores[currentStep.id] === lvl;

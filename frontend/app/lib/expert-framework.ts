@@ -162,17 +162,45 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
   {
     name: "Vision",
     area: "Ideas & Opportunities",
-    hint: "",
+    hint: "Work towards your vision of the future.",
     description: "Imagine the future. Develop a vision to turn ideas into action. Visualise future scenarios to help guide effort and action.",
     threads: [
       {
-        id: "",
-        title: "",
+        id: "vi_imagine",
+        title: "Imagine",
         levels: {
-          1: "",
-          4: "",
-          6: "",
-          8: ""
+          1: "I can imagine a desirable future.",
+          2: "I can develop simple future scenarios where value is created for my community and surroundings.",
+          3: "I can develop (alone or with others) an inspiring vision for the future that involves others.",
+          4: "I can build future scenarios around my value-creating activity.",
+          5: "I can use my understanding of the context to identify different strategic visions for creating value.",
+          6: "I can discuss my (or my team's) strategic vision for creating value.",
+          7: "I can develop (alone or with others) and compare different future scenarios.",
+          8: "I can show different audiences the benefits of my vision during turbulent times."
+        }
+      },
+      {
+        id: "vi_think",
+        title: "Think Strategically",
+        levels: {
+          3: "I can explain what a vision is and what purpose it serves.",
+          4: "I am aware of what is needed to build a vision.",
+          5: "I can explain the role of a vision statement for strategic planning.",
+          6: "I can prepare a vision statement for my (or my team's) value creating activity that guides internal decision making throughout the whole process of creating value.",
+          7: "I can plan backwards from my vision to design the necessary strategy to achieve it.",
+          8: "I can encourage enthusiasm and a sense of belonging around a convincing vision."
+        }
+      },
+      {
+        id: "vi_action",
+        title: "Guide Action",
+        levels: {
+          3: "My vision for creating value drives me to make the effort to turn ideas into action.",
+          4: "I can decide what type of vision for creating value I would like to contribute to.",
+          5: "I can identify the changes needed to achieve my vision.",
+          6: "I can promote initiatives for change and transformation that contribute to my vision.",
+          7: "I can identify challenges related to my (or my team's) vision, while respecting the different levels of the system and the variety of stake- holders affected.",
+          8: "I can create (alone or with others) a ‘roadmap’ based on my vision for creating value."
         }
       }
     ]
@@ -180,17 +208,88 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
   {
     name: "Valuing Ideas",
     area: "Ideas & Opportunities",
-    hint: "",
+    hint: "Make the most of ideas and opportunities.",
     description: "Judge what value is in social, cultural and economic terms. Recognise the potential an idea has for creating value and identify suitable ways of making the most out of it.",
     threads: [
       {
-        id: "",
-        title: "",
+        id: "vi_value",
+        title: "Recognise the value of ideas",
         levels: {
-          1: "",
-          4: "",
-          6: "",
-          8: ""
+          1: "I can find examples of ideas that have value for myself and others.",
+          2: "I can show how different groups, such as firms and institutions, create value in my community and surroundings.",
+          3: "I can tell the difference between social, cultural and economic value.",
+          4: "I can decide which type of value I want to act on and then choose the most appropriate pathway to do so.",
+          5: "I recognise the many forms of value that could be created through entrepreneurship, such as social, cultural or economic value.",
+          6: "I can break down a value chain into its different parts and identify how value is added in each part.",
+          7: "I can develop strategies to effectively make the most of opportunities to create value in my organisation or venture.",
+          8: "I can state the value of a new idea from different stakeholders' perspectives."
+        }
+      },
+      {
+        id: "vi_protect",
+        title: "Share and protect ideas",
+        levels: {
+          1: "I can clarify that other people’s ideas can be used and acted on, while respecting their rights.",
+          2: "I can explain that ideas can be shared and circulated for the benefit of everyone or can be protected by certain rights, for example, copyrights or patents.",
+          3: "I can tell the difference between types of licences that can be used to share ideas and protect rights.",
+          4: "I can choose the most appropriate licence for the purpose of sharing and protecting the value created by my ideas.",
+          5: "I can tell the difference between trademarks, registered design rights, patents, geographical indications, trade secrets, confidentiality agreements and copyright licences, including open, public-domain licences such as creative commons.",
+          6: "When creating ideas with others, I can outline a dissemination and exploitation agreement that benefits all partners involved.",
+          7: "I can develop a tailored strategy on intellectual property rights that deals with geographic requirements.",
+          8: "I can develop a strategy on intellectual property rights that is tailored to the age of my portfolio."
+        }
+      },
+      {
+        id: "vi_ethically",
+        title: "Behave Ethically",
+        levels: {
+          1: "I can recognise behaviours that show integrity, honesty, responsibility, courage and commitment.",
+          2: "I can describe in my own words the importance of integrity and ethical values.",
+          3: "I can apply ethical thinking to consumption and production processes.",
+          4: "I am driven by honesty and integrity when taking decisions.",
+          5: "I can argue that ideas for creating value should be supported by ethics and values relating to gender, equality, fairness, social justice and environmental sustainability.",
+          6: "I can take responsibility for promoting ethical behaviour in my area of influence, (for example, by promoting gender balance, highlighting inequalities and any lack of integrity).",
+          7: "I make it my priority to make sure that ethical behaviour is respected and promoted in my area of influence.",
+          8: "I take action against unethical behaviour."
+        }
+      },
+      {
+        id: "vi_sustainably",
+        title: "Think Sustainably",
+        levels: {
+          1: "I can list examples of environmentally friendly behaviour that benefits a community.",
+          2: "I can recognise examples of environmentally friendly behaviour by companies that creates value for society as a whole.",
+          3: "I can identify practices that are not sustainable and their implications for the environment.",
+          4: "I can produce a clear problem statement when faced with practices that are not sustainable.",
+          5: "I can discuss the impact an organisation has on the environment (and vice versa).",
+          6: "I can discuss the relationship between society and technical developments, relating to their implications for the environment.",
+          7: "I can choose adequate methods for analysing environmental impact based on their advantages and disadvantages.",
+          8: "I can contribute to self-regulation discussions within my sector of operations."
+        }
+      },
+      {
+        id: "vi_impact",
+        title: "Assess Impact",
+        levels: {
+          1: "I can find and list examples of changes caused by human action in social, cultural, environmental or economic contexts.",
+          2: "I can tell the difference between the impact of a value creating activity on the target community and the broader impact on society.",
+          3: "I can identify the impact that taking up opportunities will have on me and my team, on the target group and on the surrounding community.",
+          4: "I can identify stakeholders who are affected by the change brought about by my (or my team's) value creating activity, including stakeholders who cannot speak up (for example, future generations, climate or nature).",
+          5: "I can analyse the implications of my value creating activity within the boundaries of the system I am working in.",
+          6: "I can define the purpose of the impact assessment, impact monitoring, and evaluation of impact.",
+          7: "I can choose ‘measure indicators’ to monitor and assess the impact of my value creating activity.",
+          8: "I can carry out impact assessment, impact monitoring, and impact evaluation on my valuecreating activity."
+        }
+      },
+      {
+        id: "vi_accountable",
+        title: "Be Accountable",
+        levels: {
+          4: "I can tell the difference between accounting for use of resources and accounting for the impact of my value creating activity on stakeholders and the environment.",
+          5: "I can tell the difference between input, output, outcomes and impact.",
+          6: "I can discuss a range of accountability methods for both functional and strategic accountability.",
+          7: "I can use the accountability methods that hold me responsible to our internal and external stakeholders.",
+          8: "I can design ways to be accountable to all of our stakeholders."
         }
       }
     ]
