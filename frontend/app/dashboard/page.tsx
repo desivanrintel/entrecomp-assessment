@@ -101,8 +101,8 @@ export default function UserDashboard() {
           {latestAssessment && (
             <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-black text-slate-800">Detailed Profile</h3>
-                <button onClick={() => router.push("/results")} className="font-bold text-xs hover:underline" style={{ color: AREA_COLORS["Ideas & Opportunities"] }}>View Detailed Chart →</button>
+                <h3 className="text-lg font-black text-slate-800">Simplified Entrecomp Profile</h3>
+                <button onClick={() => router.push("/results")} className="font-bold text-xs hover:underline" style={{ color: AREA_COLORS["Ideas & Opportunities"] }}>View Chart →</button>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -122,7 +122,7 @@ export default function UserDashboard() {
                   );
                 })}
               </div>
-              <button onClick={() => router.push("/assessment")} className="mt-6 w-full py-3 bg-slate-50 text-slate-500 rounded-xl font-bold text-xs hover:bg-slate-100 transition">Update Basic Profile</button>
+              <button onClick={() => router.push("/assessment")} className="mt-6 w-full py-3 bg-slate-50 text-slate-500 rounded-xl font-bold text-xs hover:bg-slate-100 transition">Update Simplified Entrecomp Profile</button>
             </div>
           )}
 
@@ -131,9 +131,9 @@ export default function UserDashboard() {
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2">
                 <span className="bg-amber-500 text-slate-900 text-[10px] font-black px-2 py-0.5 rounded uppercase">Expert</span>
-                <h3 className="text-lg font-bold">Competence Matrix</h3>
+                <h3 className="text-lg font-bold">Entrecomp Matrix</h3>
               </div>
-              {latestExpert && <button onClick={() => router.push("/results/expert")} className="text-amber-500 font-bold text-xs hover:text-amber-400">View DNA Matrix →</button>}
+              {latestExpert && <button onClick={() => router.push("/results/expert")} className="text-amber-500 font-bold text-xs hover:text-amber-400">View Entrecomp Matrix →</button>}
             </div>
 
             {latestExpert ? (
