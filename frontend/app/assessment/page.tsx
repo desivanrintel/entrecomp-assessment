@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ENTRECOMP_STEPS } from "@/app/lib/constants";
 
@@ -16,13 +16,54 @@ export default function AssessmentWizard() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true); // Track initial data load
   const [scores, setScores] = useState<Record<string, number>>(
     Object.fromEntries(ENTRECOMP_STEPS.flatMap(s => s.fields.map(f => [f.key, 1])))
   );
 
+  // 1. Fetch existing assessment data on mount to pre-load the sliders
+  useEffect(() => {
+    const fetchExistingData = async () => {
+      const token = localStorage.getItem("token");
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+      if (!token) {
+        setFetching(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/assessments/latest`, {
+          method: "GET",
+          headers: { 
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data) {
+            // Merge existing scores from the database into the state
+            setScores(prevScores => ({
+              ...prevScores,
+              ...data
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to pre-load assessment data:", err);
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    fetchExistingData();
+  }, []);
+
   const currentData = ENTRECOMP_STEPS[step];
 
-  // Integration: The actual Save function
+  // 2. Submit/Update the assessment
   const submitAssessment = async () => {
     setLoading(true);
     const token = localStorage.getItem("token");
@@ -52,11 +93,20 @@ export default function AssessmentWizard() {
     }
   };
 
+  // Loading state while checking for existing data
+  if (fetching) return (
+    <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
+      <div className="text-center animate-pulse">
+        <p className="text-slate-400 font-bold">Resuming your progress...</p>
+      </div>
+    </div>
+  );
+
   return (
     <main className="min-h-screen bg-[#f8fafc] py-12 px-4">
       <div className="max-w-2xl mx-auto">
         
-        {/* Animated Progress Header */}
+        {/* Progress Header */}
         <div className="mb-10 text-center">
             <span className="text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
                 Step {step + 1} of 3
@@ -72,7 +122,7 @@ export default function AssessmentWizard() {
             </div>
         </div>
 
-        {/* Assessment Cards */}
+        {/* Assessment Questions */}
         <div className="space-y-6">
           {currentData.fields.map((field) => {
             const level = getLevelInfo(scores[field.key]);
@@ -96,7 +146,7 @@ export default function AssessmentWizard() {
                     min="1"
                     max="8"
                     step="1"
-                    value={scores[field.key]}
+                    value={scores[field.key] || 1}
                     onChange={(e) => setScores({ ...scores, [field.key]: parseInt(e.target.value) })}
                     className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600"
                   />
@@ -117,7 +167,7 @@ export default function AssessmentWizard() {
           })}
         </div>
 
-        {/* Navigation Buttons */}
+        {/* Navigation */}
         <div className="mt-12 flex items-center justify-between">
           <button
             disabled={step === 0 || loading}
@@ -136,13 +186,13 @@ export default function AssessmentWizard() {
                 setStep(step + 1);
                 window.scrollTo(0, 0);
               } else {
-                submitAssessment(); // Now calling the integrated function
+                submitAssessment();
               }
             }}
             disabled={loading}
             className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-blue-600 shadow-xl shadow-slate-200 transition-all active:scale-95 disabled:bg-slate-400"
           >
-            {loading ? "Generating Profile..." : step === 2 ? "Finish & View DNA" : "Continue"}
+            {loading ? "Saving Progress..." : step === 2 ? "Finish Assessment" : "Continue"}
           </button>
         </div>
       </div>

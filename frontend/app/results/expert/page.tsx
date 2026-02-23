@@ -62,82 +62,96 @@ export default function ExpertResultsPage() {
           <h1 className="text-4xl font-black text-slate-900">Your Entrepreneurial DNA</h1>
           <p className="text-slate-500 mt-2">Expert-level proficiency across 60 building blocks.</p>
         </header>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
           {/* Radar Chart */}
           <div className="h-[500px] bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-  <ResponsiveContainer width="100%" height="100%">
-    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
-      <PolarGrid stroke="#e2e8f0" />
-      <PolarAngleAxis 
-        dataKey="subject" 
-        tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }} 
-      />
-      <PolarRadiusAxis 
-        angle={30} 
-        domain={[0, 8]} 
-        tickCount={9} 
-        tick={{ fontSize: 10, fill: '#cbd5e1' }}
-      />
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
+              <PolarGrid stroke="#e2e8f0" />
+              <PolarAngleAxis 
+                dataKey="subject" 
+                tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }} 
+              />
+              <PolarRadiusAxis 
+                angle={30} 
+                domain={[0, 8]} 
+                tickCount={9} 
+                tick={{ fontSize: 10, fill: '#cbd5e1' }}
+              />
 
-      {/* Radar for Ideas & Opportunities (Blue/Primary) */}
-      <Radar
-    name="Ideas & Opportunities"
-    dataKey="ideasScore"  // <--- This must match the interface key
-    stroke={AREA_COLORS["Ideas & Opportunities"]}
-    fill={AREA_COLORS["Ideas & Opportunities"]}
-    fillOpacity={0.5}
-    connectNulls={true} 
-    />
+              {/* Radar for Ideas & Opportunities (Blue/Primary) */}
+              <Radar
+            name="Ideas & Opportunities"
+            dataKey="ideasScore"  // <--- This must match the interface key
+            stroke={AREA_COLORS["Ideas & Opportunities"]}
+            fill={AREA_COLORS["Ideas & Opportunities"]}
+            fillOpacity={0.5}
+            connectNulls={true} 
+            />
 
-    {/* Resources Radar */}
-    <Radar
-    name="Resources"
-    dataKey="resourcesScore" // <--- This must match the interface key
-    stroke={AREA_COLORS["Resources"]}
-    fill={AREA_COLORS["Resources"]}
-    fillOpacity={0.5}
-    connectNulls={true}
-    />
+            {/* Resources Radar */}
+            <Radar
+            name="Resources"
+            dataKey="resourcesScore" // <--- This must match the interface key
+            stroke={AREA_COLORS["Resources"]}
+            fill={AREA_COLORS["Resources"]}
+            fillOpacity={0.5}
+            connectNulls={true}
+            />
 
-    {/* Action Radar */}
-    <Radar
-    name="Into Action"
-    dataKey="actionScore" // <--- This must match the interface key
-    stroke={AREA_COLORS["Into Action"]}
-    fill={AREA_COLORS["Into Action"]}
-    fillOpacity={0.5}
-    connectNulls={true}
-    />
-    </RadarChart>
-  </ResponsiveContainer>
-</div>
-
-        
+            {/* Action Radar */}
+            <Radar
+            name="Into Action"
+            dataKey="actionScore" // <--- This must match the interface key
+            stroke={AREA_COLORS["Into Action"]}
+            fill={AREA_COLORS["Into Action"]}
+            fillOpacity={0.5}
+            connectNulls={true}
+            />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
+      
 
          {/* Top Strengths Summary */}
-<div className="space-y-6">
-  <h2 className="text-2xl font-black text-slate-900">Core Competence Averages</h2>
-  <div className="grid grid-cols-1 gap-3">
-    {chartData
-      .map(item => ({
-        ...item,
-        // Create a temporary 'displayScore' to use for sorting and showing
-        displayScore: item.ideasScore || item.resourcesScore || item.actionScore || 0
-      }))
-      .sort((a, b) => b.displayScore - a.displayScore) // Sort by the calculated score
-      .slice(0, 5)
-      .map(item => (
-        <div key={item.subject} className="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center">
-          <span className="font-bold text-slate-700">{item.subject}</span>
-          <span className="text-blue-600 font-black">
-            Lvl {item.displayScore.toFixed(1)}
-          </span>
+        <div className="space-y-6">
+          <h2 className="text-2xl font-black text-slate-900">Core Competence Averages</h2>
+          <div className="grid grid-cols-1 gap-3">
+            {chartData
+              .map(item => {
+                // Find the original competence in the framework to get its area
+                const frameworkComp = EXPERT_ASSESSMENT_FRAMEWORK.find(c => c.name === item.subject);
+                const areaName = frameworkComp?.area || "";
+                
+                return {
+                  ...item,
+                  displayScore: item.ideasScore || item.resourcesScore || item.actionScore || 0,
+                  areaColor: AREA_COLORS[areaName] || '#64748b' // Fallback to slate if not found
+                };
+              })
+              .sort((a, b) => b.displayScore - a.displayScore)
+              .slice(0, 5)
+              .map(item => (
+                <div key={item.subject} className="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    {/* Added a color indicator dot */}
+                    <div 
+                      className="w-2 h-2 rounded-full" 
+                      style={{ backgroundColor: item.areaColor }} 
+                    />
+                    <span className="font-bold text-slate-700">{item.subject}</span>
+                  </div>
+                  <span 
+                    className="font-black" 
+                    style={{ color: item.areaColor }}
+                  >
+                    Lvl {item.displayScore.toFixed(1)}
+                  </span>
+                </div>
+              ))}
+          </div>
         </div>
-      ))}
-  </div>
-</div>
-</div>
+      </div>
         {/* Detailed Thread Breakdown */}
         <h2 className="text-3xl font-black text-slate-900 mb-8">Detailed Thread Analysis</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
