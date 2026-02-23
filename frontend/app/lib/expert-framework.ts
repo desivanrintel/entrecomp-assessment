@@ -101,7 +101,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
           3: "I can experiment with my skills and competences in situations that are new to me.",
           4: "I can actively search for new solutions that meet my needs.",
           5: "I can actively search for new solutions that improve the value creating process.",
-          6: "I can combine my understanding of different contexts to transfer knowledge, ideas, and solutions across different areas."
+          8: "I can combine my understanding of different contexts to transfer knowledge, ideas, and solutions across different areas."
         }
       },
       {
