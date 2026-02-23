@@ -5,6 +5,7 @@ export interface Thread {
 }
 
 export interface ExpertCompetence {
+  id: string;
   name: string;
   area: "Ideas & Opportunities" | "Resources" | "Into Action";
   hint: string;
@@ -20,6 +21,7 @@ export const AREA_COLORS: Record<string, string> = {
 
 export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
   {
+    id: "spotting_opportunities",
     name: "Spotting Opportunities",
     area: "Ideas & Opportunities",
     hint: "Use your imagination and abilities to identify opportunities for creating value.",
@@ -84,6 +86,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "creativity",
     name: "Creativity",
     area: "Ideas & Opportunities",
     hint: "Develop creative and purposeful ideas",
@@ -160,6 +163,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "vision",
     name: "Vision",
     area: "Ideas & Opportunities",
     hint: "Work towards your vision of the future.",
@@ -206,6 +210,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "valuing_ideas",
     name: "Valuing Ideas",
     area: "Ideas & Opportunities",
     hint: "Make the most of ideas and opportunities.",
@@ -243,13 +248,14 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "ethical_thinking",
     name: "Ethical & Sustainabable Thinking",
     area: "Ideas & Opportunities",
     hint: "Assess the consequences and impact of ideas, opportunities and actions",
     description: "Assess the consequences of ideas that bring value and the effect of entrepreneurial action on the target community, the market, society and the environment. Reflect on h w sustainable long-term social, cultural and economic goals are, and the course of action chosen. Act responsibly.",
     threads: [
       {
-        id: "vi_ethically",
+        id: "et_ethically",
         title: "Behave Ethically",
         levels: {
           1: "I can recognise behaviours that show integrity, honesty, responsibility, courage and commitment.",
@@ -263,7 +269,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
         }
       },
       {
-        id: "vi_sustainably",
+        id: "et_sustainably",
         title: "Think Sustainably",
         levels: {
           1: "I can list examples of environmentally friendly behaviour that benefits a community.",
@@ -277,7 +283,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
         }
       },
       {
-        id: "vi_impact",
+        id: "et_impact",
         title: "Assess Impact",
         levels: {
           1: "I can find and list examples of changes caused by human action in social, cultural, environmental or economic contexts.",
@@ -291,7 +297,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
         }
       },
       {
-        id: "vi_accountable",
+        id: "et_accountable",
         title: "Be Accountable",
         levels: {
           4: "I can tell the difference between accounting for use of resources and accounting for the impact of my value creating activity on stakeholders and the environment.",
@@ -304,6 +310,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "self_awareness",
     name: "Self-Awareness & Self-Efficacy",
     area: "Resources",
     hint: "Believe in yourself and keep developing.",
@@ -361,6 +368,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "motivation",
     name: "Motivation & Perseverance",
     area: "Resources",
     hint: "Stay focused and don’t give up.",
@@ -418,7 +426,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
         }
       },
       {
-        id: "",
+        id: "mp_giveup",
         title: "Don't Give Up",
         levels: {
           1: "I do not give up and I can keep going even when facing difficulties.",
@@ -433,6 +441,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "mobilising_resources",
     name: "Mobilising Resources",
     area: "Resources",
     hint: "Get and manage the resources you need.",
@@ -497,6 +506,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "financial_literacy",
     name: "Financial & Economic Literacy",
     area: "Resources",
     hint: "Develop financial and economic know-how.",
@@ -559,6 +569,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "mobilising_others",
     name: "Mobilising Others",
     area: "Resources",
     hint: "Inspire, engage and get others on board.",
@@ -622,6 +633,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "taking_initiative",
     name: "Taking the initiative",
     area: "Into Action",
     hint: "Go for it",
@@ -669,6 +681,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "planning_management",
     name: "Planning & Management",
     area: "Into Action",
     hint: "",
@@ -758,6 +771,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "coping_with_ambiguity",
     name: "Coping with uncertainty, ambiguity & risk",
     area: "Into Action",
     hint: "Make decisions dealing with uncertainty, ambiguity and risk.",
@@ -806,6 +820,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "working_with_others",
     name: "Working with others",
     area: "Into Action",
     hint: "Team up, work together, and network.",
@@ -894,6 +909,7 @@ export const EXPERT_ASSESSMENT_FRAMEWORK: ExpertCompetence[] = [
     ]
   },
   {
+    id: "learning_through_experience",
     name: "Learning through experience",
     area: "Into Action",
     hint: "Learning by doing",

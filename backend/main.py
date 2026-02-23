@@ -114,13 +114,28 @@ class DBExpertAssessment(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
-    # Store the 60 scores as a JSON object: {"so_seize": 5, "so_value": 4, ...}
-    thread_scores = Column(JSON) 
+    # Store the 60 raw scores
+    thread_scores = Column(JSON)
     
-    # Pre-calculated competence averages for faster charting
-    ideas_avg = Column(Float)
-    resources_avg = Column(Float)
-    action_avg = Column(Float)
+    # Pre-calculated competence averages (Matching constants.ts keys)
+    spotting_opportunities = Column(Float)
+    creativity = Column(Float)
+    vision = Column(Float)
+    valuing_ideas = Column(Float)
+    ethical_thinking = Column(Float)
+    self_awareness = Column(Float)
+    motivation = Column(Float)
+    mobilising_resources = Column(Float)
+    financial_literacy = Column(Float)
+    mobilising_others = Column(Float)
+    taking_initiative = Column(Float)
+    planning_management = Column(Float)
+    coping_with_ambiguity = Column(Float)
+    working_with_others = Column(Float)
+    learning_through_experience = Column(Float)
+
+    # CHANGE THIS: Use 'owner' instead of 'user' to match the error's expectation
+    owner = relationship("DBUser", back_populates="expert_assessments")
 
 
 # Don't forget to add the relationship to your DBUser class as well:
@@ -181,6 +196,7 @@ class AssessmentSubmit(BaseModel):
     coping_with_ambiguity: int
     working_with_others: int
     learning_through_experience: int
+
 
 
 # --- EXPERT ASSESSMENT MAPPING ---
@@ -489,32 +505,75 @@ def get_user_assessment_history(
 
 @app.post("/api/assessments/expert")
 def submit_expert_assessment(
-    scores: dict, # Dictionary from frontend, e.g., {"so_seize": 4, "so_value": 5, ...}
+    scores: dict, 
     db: Session = Depends(get_db),
     current_user: DBUser = Depends(get_current_user)
 ):
-    # This will store the averaged scores for the 15 competences
-    calculated_results = {}
-    
-    for area, competences in EXPERT_MAPPING.items():
-        for comp_key, thread_ids in competences.items():
-            # Filter the user's submitted scores for the specific threads in this competence
-            relevant_scores = [scores.get(tid) for tid in thread_ids if scores.get(tid) is not None]
-            
-            if relevant_scores:
-                avg_score = sum(relevant_scores) / len(relevant_scores)
-                calculated_results[comp_key] = round(avg_score, 2)
-            else:
-                calculated_results[comp_key] = 0
+    try:
+        calculated_results = {}
+        
+        # 1. Calculate the 15 Competence Averages
+        for area, competences in EXPERT_MAPPING.items():
+            for comp_key, thread_ids in competences.items():
+                relevant_scores = [scores.get(tid) for tid in thread_ids if scores.get(tid) is not None]
+                if relevant_scores:
+                    avg_score = sum(relevant_scores) / len(relevant_scores)
+                    calculated_results[comp_key] = round(avg_score, 2)
+                else:
+                    calculated_results[comp_key] = 0.0
 
-    # Create the DB record
-    new_assessment = DBExpertAssessment(
-        user_id=current_user.id,
-        thread_scores=scores, # Store the full 60 results for AI analysis later
-        **calculated_results   # Spread the 15 averages into the competence columns
-    )
+        # 2. Create the Instance explicitly to avoid "unpacking" errors
+        new_assessment = DBExpertAssessment(
+            user_id=current_user.id,
+            thread_scores=scores,  # This saves the raw 60 threads as JSON
+            # Manually map the 15 results
+            spotting_opportunities=calculated_results.get("spotting_opportunities", 0),
+            creativity=calculated_results.get("creativity", 0),
+            vision=calculated_results.get("vision", 0),
+            valuing_ideas=calculated_results.get("valuing_ideas", 0),
+            ethical_thinking=calculated_results.get("ethical_thinking", 0),
+            self_awareness=calculated_results.get("self_awareness", 0),
+            motivation=calculated_results.get("motivation", 0),
+            mobilising_resources=calculated_results.get("mobilising_resources", 0),
+            financial_literacy=calculated_results.get("financial_literacy", 0),
+            mobilising_others=calculated_results.get("mobilising_others", 0),
+            taking_initiative=calculated_results.get("taking_initiative", 0),
+            planning_management=calculated_results.get("planning_management", 0),
+            coping_with_ambiguity=calculated_results.get("coping_with_ambiguity", 0),
+            working_with_others=calculated_results.get("working_with_others", 0),
+            learning_through_experience=calculated_results.get("learning_through_experience", 0)
+        )
+        
+        # 3. Save and Commit
+        db.add(new_assessment)
+        print(f"DEBUG: Saving assessment for user {current_user.id}")
+        print(f"DEBUG: Thread Scores: {scores}")
+        print(f"DEBUG: Calculated results: {calculated_results}")
+        db.commit()
+        db.refresh(new_assessment) # This pulls the ID back from the DB
+        
+        return {
+            "status": "success",
+            "assessment_id": new_assessment.id,
+            "results": calculated_results
+        }
+
+    except Exception as e:
+        db.rollback() # Rollback if there is a DB error
+        print(f"ERROR SAVING EXPERT ASSESSMENT: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
     
-    db.add(new_assessment)
-    db.commit()
+
+@app.get("/api/assessments/expert/latest")
+def get_latest_expert_assessment(
+    db: Session = Depends(get_db),
+    current_user: DBUser = Depends(get_current_user)
+):
+    assessment = db.query(DBExpertAssessment).filter(
+        DBExpertAssessment.user_id == current_user.id
+    ).order_by(DBExpertAssessment.created_at.desc()).first()
     
-    return {"message": "Expert assessment calculated and saved", "results": calculated_results}
+    if not assessment:
+        raise HTTPException(status_code=404, detail="No assessment found")
+        
+    return assessment

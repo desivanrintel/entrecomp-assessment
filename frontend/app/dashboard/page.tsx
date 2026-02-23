@@ -158,6 +158,12 @@ export default function UserDashboard() {
               >
                 Retake Assessment
               </button>
+              <button 
+                onClick={() => router.push("/assessment/expert")}
+                className="mt-8 w-full py-3 bg-gray-50 text-gray-600 rounded-xl font-bold hover:bg-gray-100 transition"
+              >
+                Take Expert Assessment
+              </button>
             </div>
           ) : (
             <div className="bg-gray-900 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
