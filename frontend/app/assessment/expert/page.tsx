@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react"; // Added useEffect
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { EXPERT_ASSESSMENT_FRAMEWORK, AREA_COLORS } from "@/app/lib/expert-framework";
 
@@ -8,73 +8,60 @@ export default function ExpertAssessmentPage() {
   const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true); // Added to track initial data load
+  const [fetching, setFetching] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // --- 1. STATE INITIALIZATION ---
   const [scores, setScores] = useState<Record<string, number>>({});
 
-  // --- 2. DATA PRE-LOADING LOGIC ---
   useEffect(() => {
     const fetchExistingExpertData = async () => {
       const token = localStorage.getItem("token");
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
-      if (!token) {
-        setFetching(false);
-        return;
-      }
-
+      if (!token) { setFetching(false); return; }
       try {
         const response = await fetch(`${API_URL}/api/assessments/expert/latest`, {
-          method: "GET",
-          headers: { 
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
+          headers: { "Authorization": `Bearer ${token}` },
         });
-
         if (response.ok) {
           const data = await response.json();
-          // If data exists, it should contain thread_scores or a flat record of IDs
-          if (data && data.thread_scores) {
-            setScores(data.thread_scores);
-          } else if (data) {
-            setScores(data);
-          }
+          if (data?.thread_scores) setScores(data.thread_scores);
+          else if (data) setScores(data);
         }
       } catch (err) {
-        console.error("Failed to pre-load expert assessment:", err);
-      } finally {
-        setFetching(false);
-      }
+        console.error("Failed to pre-load:", err);
+      } finally { setFetching(false); }
     };
-
     fetchExistingExpertData();
   }, []);
 
-  // --- 3. DATA ORCHESTRATION ---
   const allSteps = useMemo(() => {
     return EXPERT_ASSESSMENT_FRAMEWORK.flatMap((comp) =>
       comp.threads.map((thread) => ({
         ...thread,
         parentCompetence: comp.name,
         area: comp.area,
-        competenceDescription: comp.description,
-        competenceHint: comp.hint
       }))
     );
   }, []);
 
+  // Center the active step in the scrollable container
+  useEffect(() => {
+    if (scrollRef.current) {
+      const activeElement = scrollRef.current.children[stepIndex] as HTMLElement;
+      if (activeElement) {
+        scrollRef.current.scrollTo({
+          left: activeElement.offsetLeft - scrollRef.current.offsetWidth / 2 + activeElement.offsetWidth / 2,
+          behavior: "smooth"
+        });
+      }
+    }
+  }, [stepIndex]);
+
   const currentStep = allSteps[stepIndex];
   const progress = ((stepIndex + 1) / allSteps.length) * 100;
-  const accentColor = AREA_COLORS[currentStep.area] || "#2563eb"; 
+  const accentColor = AREA_COLORS[currentStep.area] || "#2563eb";
   const lightAccentColor = `${accentColor}1a`;
-  
-  const availableLevels = Object.keys(currentStep.levels)
-    .map(Number)
-    .sort((a, b) => a - b);
 
-  // --- 4. HANDLERS ---
   const handleNext = () => {
     if (stepIndex < allSteps.length - 1) {
       setStepIndex(stepIndex + 1);
@@ -88,93 +75,110 @@ export default function ExpertAssessmentPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
-      const response = await fetch(`${API_URL}/api/assessments/expert`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/assessments/expert`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify(scores),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to save");
-      }
-
+      if (!response.ok) throw new Error("Failed to save");
       router.push("/results/expert");
     } catch (error: any) {
-      console.error("Submission Error:", error);
       alert(`Error: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
-  // Prevent rendering the form until we know if there is existing data to pre-load
-  if (fetching) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fcfcfd]">
-        <div className="text-center animate-pulse">
-          <p className="text-slate-400 font-bold tracking-widest uppercase text-xs">Resuming Matrix Analysis...</p>
-        </div>
-      </div>
-    );
-  }
+  if (fetching) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   return (
     <main className="min-h-screen bg-[#fcfcfd] py-12 px-4">
       <div className="max-w-4xl mx-auto">
         
-        {/* Progress Header */}
+        {/* INTEGRATED PROGRESS BAR & DOTS */}
         <div className="mb-12">
-          <div className="flex justify-between items-end mb-4">
+          <div className="flex justify-between items-end mb-6">
             <div>
-              <span style={{ color: accentColor }} className="font-bold text-sm tracking-widest uppercase">
-                Expert Assessment
+              <span style={{ color: accentColor }} className="font-black text-[10px] uppercase tracking-widest">
+                {currentStep.area} Progress
               </span>
-              <h2 className="text-xl font-bold text-slate-400">
-                Step {stepIndex + 1} <span className="text-slate-300">/ {allSteps.length}</span>
+              <h2 className="text-xl font-bold text-slate-900">
+                Step {stepIndex + 1} <span className="text-slate-300 font-medium">/ {allSteps.length}</span>
               </h2>
             </div>
+            <div className="bg-slate-100 px-3 py-1 rounded-full">
+               <span className="text-xs font-bold text-slate-500">{Math.round(progress)}% Complete</span>
+            </div>
           </div>
-          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+
+          <div className="relative h-12 flex items-center">
+            {/* The Horizontal Line (Background) */}
+            <div className="absolute top-1/2 left-0 w-full h-1 bg-slate-100 -translate-y-1/2 rounded-full" />
+            
+            {/* The Active Progress Line */}
             <div 
-              className="h-full transition-all duration-500 ease-out"
+              className="absolute top-1/2 left-0 h-1 -translate-y-1/2 rounded-full transition-all duration-500 ease-out" 
               style={{ width: `${progress}%`, backgroundColor: accentColor }}
             />
+
+            {/* Scrollable Dots Container */}
+            <div 
+              ref={scrollRef}
+              className="absolute inset-0 flex items-center gap-6 overflow-x-auto no-scrollbar px-4"
+            >
+              {allSteps.map((step, idx) => {
+                const isCompleted = !!scores[step.id];
+                const isActive = stepIndex === idx;
+                const areaColor = AREA_COLORS[step.area];
+
+                return (
+                  <button
+                    key={step.id}
+                    onClick={() => setStepIndex(idx)}
+                    className={`relative z-10 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isActive ? "scale-125 shadow-lg shadow-white" : "scale-100"
+                    }`}
+                    style={{
+                      backgroundColor: isCompleted || isActive ? areaColor : "#e2e8f0",
+                      border: isActive ? `3px solid white` : 'none',
+                      boxShadow: isActive ? `0 0 0 2px ${areaColor}` : 'none'
+                    }}
+                  >
+                    {isCompleted ? (
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={5} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      <div className={`w-1 h-1 rounded-full ${isActive ? 'bg-white' : 'bg-slate-400 opacity-50'}`} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Sidebar and interactive areas remain the same... */}
           <div className="lg:col-span-4">
-            <div className="bg-white p-6 rounded-3xl border shadow-sm sticky top-8" style={{ borderColor: accentColor }}>
+            <div className="bg-white p-6 rounded-3xl border shadow-sm sticky top-8 transition-colors duration-500" style={{ borderColor: accentColor }}>
               <span style={{ backgroundColor: lightAccentColor, color: accentColor }} className="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter mb-4">
                 {currentStep.area}
               </span>
               <h3 className="text-lg font-black text-slate-900 mb-2">{currentStep.parentCompetence}</h3>
-              <h4 className="text-sm font-bold text-slate-500 mb-3">{currentStep.competenceHint}</h4>
               <p className="text-xs text-slate-500 leading-relaxed italic border-l-2 pl-3" style={{ borderColor: lightAccentColor }}>
-                "{currentStep.competenceDescription}"
+                "{currentStep.title}"
               </p>
             </div>
           </div>
 
           <div className="lg:col-span-8">
             <div className="mb-8">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">
-                Building Block
-              </span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">Building Block</span>
               <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">
                 {currentStep.title}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {availableLevels.map((lvl) => {
+              {Object.keys(currentStep.levels).map(Number).sort((a,b)=>a-b).map((lvl) => {
                 const isSelected = scores[currentStep.id] === lvl;
                 return (
                   <button
@@ -185,11 +189,9 @@ export default function ExpertAssessmentPage() {
                     }`}
                     style={isSelected ? { borderColor: accentColor, backgroundColor: lightAccentColor } : {}}
                   >
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: isSelected ? accentColor : "#94a3b8" }}>
-                        Level {lvl}
-                      </span>
-                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest mb-3" style={{ color: isSelected ? accentColor : "#94a3b8" }}>
+                      Level {lvl}
+                    </span>
                     <p className={`text-xs leading-relaxed ${isSelected ? "font-semibold" : "text-slate-600"}`} style={isSelected ? { color: accentColor } : {}}>
                       {currentStep.levels[lvl]}
                     </p>
