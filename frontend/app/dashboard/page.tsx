@@ -155,14 +155,14 @@ export default function UserDashboard() {
                 })}
               </div>
             ) : (
-              <p className="text-slate-500 text-sm mb-8">Unlock the 60-thread proficiency matrix to see your deep skills.</p>
+              <p className="text-slate-500 text-sm mb-8">Unlock the 60-thread entrecomp proficiency matrix to see your deep skills.</p>
             )}
 
             <button 
               onClick={() => router.push("/assessment/expert")}
               className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-500 transition-all shadow-xl shadow-blue-900/40 uppercase tracking-widest text-xs"
             >
-              {latestExpert ? "Recalibrate Expert Skills" : "Begin Expert Analysis"}
+              {latestExpert ? "Update Expert Entrecomp Profile" : "Begin Expert Entrecomp Analysis"}
             </button>
           </div>
         </div>
