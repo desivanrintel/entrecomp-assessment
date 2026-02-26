@@ -40,6 +40,7 @@ export default function ExpertAssessmentPage() {
         ...thread,
         parentCompetence: comp.name,
         area: comp.area,
+        competenceDescription: comp.description,
       }))
     );
   }, []);
@@ -158,16 +159,18 @@ export default function ExpertAssessmentPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-4">
-            <div className="bg-white p-6 rounded-3xl border shadow-sm sticky top-8 transition-colors duration-500" style={{ borderColor: accentColor }}>
-              <span style={{ backgroundColor: lightAccentColor, color: accentColor }} className="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter mb-4">
-                {currentStep.area}
-              </span>
-              <h3 className="text-lg font-black text-slate-900 mb-2">{currentStep.parentCompetence}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed italic border-l-2 pl-3" style={{ borderColor: lightAccentColor }}>
-                "{currentStep.title}"
-              </p>
-            </div>
-          </div>
+  <div className="bg-white p-6 rounded-3xl border shadow-sm sticky top-8 transition-colors duration-500" style={{ borderColor: accentColor }}>
+    <span style={{ backgroundColor: lightAccentColor, color: accentColor }} className="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter mb-4">
+      {currentStep.area}
+    </span>
+    <h3 className="text-lg font-black text-slate-900 mb-2">{currentStep.parentCompetence}</h3>
+    
+    {/* This now correctly displays the Competence Description */}
+    <p className="text-xs text-slate-500 leading-relaxed italic border-l-2 pl-3" style={{ borderColor: lightAccentColor }}>
+      "{currentStep.competenceDescription}"
+    </p>
+  </div>
+</div>
 
           <div className="lg:col-span-8">
             <div className="mb-8">
@@ -184,7 +187,7 @@ export default function ExpertAssessmentPage() {
                   <button
                     key={lvl}
                     onClick={() => setScores({ ...scores, [currentStep.id]: lvl })}
-                    className={`text-left p-5 rounded-2xl border-2 transition-all duration-200 flex flex-col justify-between h-full ${
+                    className={`text-left p-5 rounded-2xl border-2 transition-all duration-200 flex flex-col justify-start h-full ${
                       isSelected ? "shadow-md scale-[1.02]" : "border-white bg-white hover:border-slate-200 shadow-sm"
                     }`}
                     style={isSelected ? { borderColor: accentColor, backgroundColor: lightAccentColor } : {}}
@@ -220,6 +223,6 @@ export default function ExpertAssessmentPage() {
           </div>
         </div>
       </div>
-    </main>
+          </main>
   );
 }
