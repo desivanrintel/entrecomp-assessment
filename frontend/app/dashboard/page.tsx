@@ -49,34 +49,42 @@ export default function UserDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      const token = localStorage.getItem("token");
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const fetchDashboardData = async () => {
+    const token = localStorage.getItem("token");
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-      if (!token) {
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const headers = { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
+      const [userRes, expertRes] = await Promise.all([
+        fetch(`${API_URL}/api/me`, { headers }),
+        // fetch(`${API_URL}/api/assessments/latest`, { headers }),
+        fetch(`${API_URL}/api/assessments/expert/latest`, { headers })
+      ]);
+
+      // --- ADD THIS CHECK HERE ---
+      // If the backend returns 401, the token is expired or invalid
+      // Removed assessmentRes.status from the 401 check
+      if (userRes.status === 401 || expertRes.status === 401) {
+        localStorage.removeItem("token");
         router.push("/login");
         return;
       }
 
-      try {
-        const headers = { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
-        const [userRes, assessmentRes, expertRes] = await Promise.all([
-          fetch(`${API_URL}/api/me`, { headers }),
-          fetch(`${API_URL}/api/assessments/latest`, { headers }),
-          fetch(`${API_URL}/api/assessments/expert/latest`, { headers })
-        ]);
-
-        if (userRes.ok) setUser(await userRes.json());
-        if (assessmentRes.ok) setLatestAssessment(await assessmentRes.json());
-        if (expertRes.ok) setLatestExpert(await expertRes.json());
-      } catch (err) {
-        console.error("Dashboard error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDashboardData();
-  }, [router]);
+      if (userRes.ok) setUser(await userRes.json());
+      if (expertRes.ok) setLatestExpert(await expertRes.json());
+    } catch (err) {
+      console.error("Dashboard error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchDashboardData();
+}, [router]);
 
   if (loading) return <div className="p-20 text-center animate-pulse text-slate-400">Loading Dashboard...</div>;
 
@@ -98,7 +106,8 @@ export default function UserDashboard() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* DETAILED (LIGHT) CARD */}
-          {latestAssessment && (
+          {/* 
+          latestAssessment && (
             <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-black text-slate-800">Simplified Entrecomp Profile</h3>
@@ -124,10 +133,12 @@ export default function UserDashboard() {
               </div>
               <button onClick={() => router.push("/assessment")} className="mt-6 w-full py-3 bg-slate-50 text-slate-500 rounded-xl font-bold text-xs hover:bg-slate-100 transition">Update Simplified Entrecomp Profile</button>
             </div>
-          )}
+          )
+          */}
 
           {/* EXPERT (DARK) CARD */}
-          <div className="bg-slate-900 p-8 rounded-[2rem] shadow-2xl border border-slate-800 text-white">
+          <h3 className="text-lg font-black text-slate-900 mb-2">Entrecomp Competency</h3>
+          <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-2">
                 <span className="bg-amber-500 text-slate-900 text-[10px] font-black px-2 py-0.5 rounded uppercase">Expert</span>
@@ -149,7 +160,7 @@ export default function UserDashboard() {
                   return (
                     <div key={area} className="p-4 rounded-2xl border" style={{ backgroundColor: getBgTint(AREA_COLORS[area], 0.15), borderColor: getBgTint(AREA_COLORS[area], 0.4) }}>
                       <p className="text-[9px] font-bold uppercase tracking-wider mb-1" style={{ color: AREA_COLORS[area] }}>{label}</p>
-                      <p className="text-2xl font-black text-white">{score.toFixed(1)}</p>
+                      <p className="text-2xl font-black text-black">{score.toFixed(1)}</p>
                     </div>
                   );
                 })}
